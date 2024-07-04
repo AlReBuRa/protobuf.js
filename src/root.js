@@ -8,7 +8,8 @@ var Namespace = require("./namespace");
 var Field   = require("./field"),
     Enum    = require("./enum"),
     OneOf   = require("./oneof"),
-    util    = require("./util");
+    util    = require("./util"),
+    path    = require("path");
 
 var Type,   // cyclic
     parse,  // might be excluded
@@ -88,6 +89,8 @@ Root.prototype.load = function load(filename, options, callback) {
         options = undefined;
     }
     var self = this;
+    var top = path.dirname(filename)
+
     if (!callback)
         return util.asPromise(load, self, filename, options);
 
@@ -129,7 +132,7 @@ Root.prototype.load = function load(filename, options, callback) {
                     i = 0;
                 if (parsed.imports)
                     for (; i < parsed.imports.length; ++i)
-                        if (resolved = getBundledFileName(parsed.imports[i]) || self.resolvePath(filename, parsed.imports[i]))
+                        if (resolved = getBundledFileName(parsed.imports[i]) || path.join(top, parsed.imports[i]))
                             fetch(resolved);
                 if (parsed.weakImports)
                     for (i = 0; i < parsed.weakImports.length; ++i)
